@@ -110,8 +110,10 @@ void balancedGreedy(Class classes[], int n){
 
         if(classroom == -1){
             classrooms.push_back(classX.end);
+            classroomsHours.push_back(classX.end - classX.init);
         }else{
             classrooms[classroom] = classX.end;
+            classroomsHours[classroom] += classX.end - classX.init;
         }
     }
     
