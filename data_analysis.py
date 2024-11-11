@@ -75,7 +75,7 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.show()
 
 
-file_path = './output/output.csv'
+file_path = './output/results.csv'
 avg_data = process_data(file_path)
 
 plot_times(avg_data)
