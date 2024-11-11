@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -50,7 +51,7 @@ int findClassroom(vector<int> &classrooms, int init) {
 }
 
 Result greedy(vector<Class> &classes) {
-    qsort(&classes[0], classes.size(), sizeof(Class), compare);
+    sort(classes.begin(), classes.end(), compare);
     vector<int> classrooms;
     vector<int> classroomsHours;
 
@@ -82,7 +83,7 @@ int findBalancedClassroom(vector<int> &classrooms, int init,
 }
 
 Result balancedGreedy(vector<Class> &classes) {
-    qsort(&classes[0], classes.size(), sizeof(Class), compare);
+    sort(classes.begin(), classes.end(), compare);
     vector<int> classrooms;
     vector<int> classroomsHours;
 
