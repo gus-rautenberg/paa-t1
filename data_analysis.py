@@ -2,7 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Função para ler o arquivo e calcular as médias
 def process_data(file_path):
     df = pd.read_csv(file_path)
     avg_data = df.groupby('num_classes').mean().reset_index()
