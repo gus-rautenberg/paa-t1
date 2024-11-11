@@ -106,11 +106,20 @@ int main(int argc, char *argv[]) {
                                300,    500,    750,    1000,   1500,   2000,
                                2500,   5000,   7500,   10000,  15000,  20000,
                                30000,  50000,  75000,  100000, 150000, 250000,
-                               350000, 500000, 750000, 100000};
+                               350000, 500000, 750000, 1000000};
 
-    printf("num_classes,unbalanced_time,unbalanced_var,balanced_time,balanced_"
-           "var\n");
+    FILE *results = fopen("results.csv", "w");
+    if (results == NULL) {
+        fprintf(stderr, "Não pôde criar 'results.csv'\n");
+        return 1;
+    }
+
+    fprintf(results,
+            "num_classes,unbalanced_time,unbalanced_var,balanced_time,balanced_"
+            "var\n");
     for (const int &num_classes : entradas) {
+        printf("%7d classes", num_classes);
+
         char input_filename[32];
         sprintf(input_filename, "entradas/Aula%u.txt", num_classes);
 
@@ -133,6 +142,9 @@ int main(int argc, char *argv[]) {
         fclose(input_file);
 
         for (int exec = 0; exec < 6; exec++) {
+            printf(" ..%d", exec + 1);
+            fflush(stdout);
+
             clock_t begin = clock();
             Result unbalanced = greedy(classes);
             float unbalanced_time = float(clock() - begin) / CLOCKS_PER_SEC;
@@ -146,8 +158,10 @@ int main(int argc, char *argv[]) {
             if (exec == 0) {
                 continue;
             }
-            printf("%u,%f,%f,%f,%f\n", num_classes, unbalanced_time,
-                   unbalanced_var, balanced_time, balanced_var);
+            fprintf(results, "%u,%f,%f,%f,%f\n", num_classes, unbalanced_time,
+                    unbalanced_var, balanced_time, balanced_var);
         }
+        printf("\n");
     }
+    fclose(results);
 }
