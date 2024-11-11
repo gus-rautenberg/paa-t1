@@ -77,8 +77,10 @@ unsigned balancedGreedy(vector<Class> &classes) {
 
         if (classroom == -1) {
             classrooms.push_back(classX.end);
+            classroomsHours.push_back(classX.end - classX.init);
         } else {
             classrooms[classroom] = classX.end;
+            classroomsHours[classroom] += classX.end - classX.init;
         }
     }
     return classrooms.size();
