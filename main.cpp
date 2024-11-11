@@ -76,3 +76,44 @@ int findClassroom(vector<int> classrooms, int init){
     return -1;
 }
 
+int findBalancedClassroom(vector<int> classrooms, int init, vector<int> classroomsHours){
+    vector<int> aux;
+    for(int i = 0; i < classrooms.size(); i++){
+        if(classrooms[i] <= init) {
+            aux.push_back(i);
+        }
+    }
+    if(aux.size() == 0) return -1;
+
+    int min = INFINITY;
+    int minIndex = 0;
+    for(int i = 0; i < aux.size(); i++){
+        if(classroomsHours[aux[i]] < min){
+            min = classroomsHours[aux[i]];
+            minIndex = aux[i];
+        }
+    }
+    
+    return minIndex;
+}
+
+void balancedGreedy(Class classes[], int n){
+
+    qsort(classes, n, sizeof(Class), compare);
+    vector<int> classrooms;
+    vector<int> classroomsHours;
+
+    for(int i = 0; i < n; i++){
+        Class classX = classes[i];        
+
+        int classroom = findBalancedClassroom(classrooms, classX.init, classroomsHours);
+
+        if(classroom == -1){
+            classrooms.push_back(classX.end);
+        }else{
+            classrooms[classroom] = classX.end;
+        }
+    }
+    
+    cout << "Classrooms: " << classrooms.size() << endl;
+}  
