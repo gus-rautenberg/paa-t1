@@ -1,39 +1,39 @@
-#include <iostream>
-#include <string>
-#include <fstream>
 #include <cstdio>
+#include <vector>
 
 using namespace std;
 
-struct Class
-{
-    int init;
-    int end;
+struct Class {
+    unsigned init;
+    unsigned end;
 };
 
-
 int main(int argc, char *argv[]) {
-
-    if(argc < 2){
-        cout << "Informe o número de aulas" << endl;
+    unsigned num_classes;
+    if (argc < 2 || sscanf(argv[1], "%u", &num_classes) != 1) {
+        fprintf(stderr, "Informe o número de tarefas\n");
+        return 1;
+    }
+    char input_filename[32];
+    sprintf(input_filename, "entradas/Aula%u.txt", num_classes);
+    FILE *input_file = fopen(input_filename, "r");
+    if (input_file == NULL) {
+        fprintf(stderr, "Arquivo '%s' não encontrado\n", input_filename);
         return 1;
     }
 
-    const char* folder = argv[1];
-    DIR* dir = opendir(folder);
-    
-    if(!dir){
-        cout << "Não foi possível abrir o diretório" << endl;
-        return 1;
+    Class *classes = new Class[num_classes];
+
+    unsigned tmp;
+    for (int i = 0; i < num_classes; i++) {
+        fscanf(input_file, "%u", &tmp);
+        classes[i].init = tmp;
+    }
+    for (int i = 0; i < num_classes; i++) {
+        fscanf(input_file, "%u", &tmp);
+        classes[i].end = tmp;
     }
 
-
-
-    string folder = "./Entradas para o Problema do Escalonamento de Aulas/";
-
-    for(const auto&entry: fs::directory_iterator(folder)){
-        cout << entry.path() << endl;
-    }
-
+    delete[] classes;
+    fclose(input_file);
 }
-
