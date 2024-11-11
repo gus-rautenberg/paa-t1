@@ -6,9 +6,24 @@
 
 using namespace std;
 
+float variance(vector<int> &hours) {
+    float mean = 0.0;
+    for (const int &v : hours) {
+        mean += v;
+    }
+    mean /= hours.size();
+
+    float var = 0.0;
+    for (const int &v : hours) {
+        var += (v - mean) * (v - mean);
+    }
+    var /= hours.size();
+    return var;
+}
+
 struct Class {
-    unsigned init;
-    unsigned end;
+    int init;
+    int end;
 };
 
 int compare(const void *a, const void *b) {
@@ -17,6 +32,11 @@ int compare(const void *a, const void *b) {
 
     return classA->init - classB->init;
 }
+
+struct Result {
+    size_t num_classrooms;
+    vector<int> classroomsHours;
+};
 
 int findClassroom(vector<int> &classrooms, int init) {
     for (int i = 0; i < classrooms.size(); i++) {
@@ -27,20 +47,23 @@ int findClassroom(vector<int> &classrooms, int init) {
     return -1;
 }
 
-unsigned greedy(vector<Class> &classes) {
+Result greedy(vector<Class> &classes) {
     qsort(&classes[0], classes.size(), sizeof(Class), compare);
     vector<int> classrooms;
+    vector<int> classroomsHours;
 
     for (const Class &classX : classes) {
         int classroom = findClassroom(classrooms, classX.init);
 
         if (classroom == -1) {
             classrooms.push_back(classX.end);
+            classroomsHours.push_back(classX.end - classX.init);
         } else {
             classrooms[classroom] = classX.end;
+            classroomsHours[classroom] += classX.end - classX.init;
         }
     }
-    return classrooms.size();
+    return {classrooms.size(), classroomsHours};
 }
 
 int findBalancedClassroom(vector<int> &classrooms, int init,
@@ -56,7 +79,7 @@ int findBalancedClassroom(vector<int> &classrooms, int init,
     return minIndex;
 }
 
-unsigned balancedGreedy(vector<Class> &classes) {
+Result balancedGreedy(vector<Class> &classes) {
     qsort(&classes[0], classes.size(), sizeof(Class), compare);
     vector<int> classrooms;
     vector<int> classroomsHours;
@@ -73,10 +96,10 @@ unsigned balancedGreedy(vector<Class> &classes) {
             classroomsHours[classroom] += classX.end - classX.init;
         }
     }
-    return classrooms.size();
+    return {classrooms.size(), classroomsHours};
 }
 int main(int argc, char *argv[]) {
-    unsigned num_classes;
+    int num_classes;
     if (argc < 2 || sscanf(argv[1], "%u", &num_classes) != 1) {
         fprintf(stderr, "Informe o número de tarefas\n");
         return 1;
@@ -90,7 +113,7 @@ int main(int argc, char *argv[]) {
     }
 
     vector<Class> classes;
-    unsigned tmp;
+    int tmp;
     for (int i = 0; i < num_classes; i++) {
         fscanf(input_file, "%u", &tmp);
         classes.push_back({tmp, 0});
@@ -101,9 +124,13 @@ int main(int argc, char *argv[]) {
     }
     fclose(input_file);
 
-    unsigned num_classrooms = greedy(classes);
-    printf("Classrooms: %u\n", num_classrooms);
+    Result unbalanced = greedy(classes);
+    float unbalanced_var = variance(unbalanced.classroomsHours);
+    printf("           num_classrooms/variance: %zu %f\n",
+           unbalanced.num_classrooms, unbalanced_var);
 
-    unsigned num_classrooms_balanced = balancedGreedy(classes);
-    printf("Classrooms (balanced): %u\n", num_classrooms_balanced);
+    Result balanced = balancedGreedy(classes);
+    float balanced_var = variance(balanced.classroomsHours);
+    printf("(balanced) num_classrooms/variance: %zu %f\n",
+           balanced.num_classrooms, balanced_var);
 }
