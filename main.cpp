@@ -45,24 +45,14 @@ unsigned greedy(vector<Class> &classes) {
 
 int findBalancedClassroom(vector<int> &classrooms, int init,
                           vector<int> &classroomsHours) {
-    vector<int> aux;
+    int minHours = INT_MAX;
+    int minIndex = -1;
     for (int i = 0; i < classrooms.size(); i++) {
-        if (classrooms[i] <= init) {
-            aux.push_back(i);
+        if (classrooms[i] <= init && classroomsHours[i] < minHours) {
+            minHours = classroomsHours[i];
+            minIndex = i;
         }
     }
-    if (aux.size() == 0)
-        return -1;
-
-    int min = INT_MAX;
-    int minIndex = 0;
-    for (int i = 0; i < aux.size(); i++) {
-        if (classroomsHours[aux[i]] < min) {
-            min = classroomsHours[aux[i]];
-            minIndex = aux[i];
-        }
-    }
-
     return minIndex;
 }
 
