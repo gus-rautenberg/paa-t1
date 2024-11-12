@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
@@ -29,80 +28,77 @@ struct Class {
     int end;
 };
 
-// int compare(const void *a, const void *b) {
-//     Class *classA = (Class *)a;
-//     Class *classB = (Class *)b;
+int compare(const void *a, const void *b) { // O(8)
+    Class *classA = (Class *)a; // atribuição e casing O(2)
+    Class *classB = (Class *)b; // atribuição e casting O(2)
 
-//     return classA->init - classB->init;
-// }
-
-bool compare(const Class& a, const Class& b) { // O(4)
-    return a.init < b.init; // return + comparação + 2 acessos O(4)
+    return classA->init - classB->init; // return, subtração e acesso ao "init" O(4)
 }
+
 struct Result {
     size_t num_classrooms;
     vector<int> classroomsHours;
 };
 
 int findClassroom(vector<int> &classrooms, int init) { // O(5n + 3)
-    for (int i = 0; i < classrooms.size(); i++) { // for normal ? O(2n + 2)
-        if (classrooms[i] <= init) { // index + comparação * for  O(2n)
-            return i; // return * for O(n)
+    for (int i = 0; i < classrooms.size(); i++) { // for normal? O(2n + 2)
+        if (classrooms[i] <= init) { // index e comparação O(2) * for(n) = O(2n)
+            return i; // return O(1) * for(n) = O(n)
         }
     }
     return -1; // return O(1)
 }
 
-Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
-    sort(classes.begin(), classes.end(), compare); // sort O(NlogN)
+Result greedy(vector<Class> &classes) {
+    qsort(&classes[0], classes.size(), sizeof(Class), compare);
     vector<int> classrooms;
     vector<int> classroomsHours;
 
-    for (const Class &classX : classes) { // for normal? O(2n + 2)
-        int classroom = findClassroom(classrooms, classX.init); // atribuição + acesso + função * for O(5n² + 5n)
+    for (const Class &classX : classes) {
+        int classroom = findClassroom(classrooms, classX.init);
 
-        if (classroom == -1) { // comparação * for (n)
-            classrooms.push_back(classX.end); // push back é constante O(1) + acesso * for O(2n)
-            classroomsHours.push_back(classX.end - classX.init); // pushback + subtração + 2 acessos * for O(4n)
-        } else { // o else é mais custoso que o if
-            classrooms[classroom] = classX.end; // index + atribuição + acesso * for O(3n)
-            classroomsHours[classroom] += classX.end - classX.init; // index + atribuição + soma + subtração + 2 acessos * for O(6n)
-            // nessa estrategia não vamos contar o custo das horas, pq n se "utiliza" em uma execução normal, estando
-            // aqui a apenas para estudo.
+        if (classroom == -1) {
+            classrooms.push_back(classX.end);
+            classroomsHours.push_back(classX.end - classX.init);
+        } else {
+            classrooms[classroom] = classX.end;
+            classroomsHours[classroom] += classX.end - classX.init;
         }
     }
-    return {classrooms.size(), classroomsHours}; // return + função O(2)
+    return {classrooms.size(), classroomsHours};
 }
 
-int findBalancedClassroom(vector<int> &classrooms, int init, vector<int> &classroomsHours) { // O(10n + 4)
+int findBalancedClassroom(vector<int> &classrooms, int init,
+                          vector<int> &classroomsHours) { // O(10n + 5)
     int minHours = INT_MAX; // atribuição O(1)
     int minIndex = -1; // atribuição O(1)
-    for (int i = 0; i < classrooms.size(); i++) { // for normal? O(2n + 2)
-        if (classrooms[i] <= init && classroomsHours[i] < minHours) { // 2 index + 2 comparações + logico * for O(5n)
-            minHours = classroomsHours[i]; // atribuição + index * for O(2n) 
-            minIndex = i; // atribuição * for O(n)
+    for (int i = 0; i < classrooms.size(); i++) { // for comum ? O(2n+2) 
+        if (classrooms[i] <= init && classroomsHours[i] < minHours) { // 2 index, 2 comparação, 1 logico O(5) * for(n) = O(5n) 
+            minHours = classroomsHours[i]; // atribuição, index = O(2) * for(n) = O(2n)
+            minIndex = i; // atribuição O(1) * for(n) = O(n)
         }
     }
     return minIndex; // atribuição O(1)
 }
 
-Result balancedGreedy(vector<Class> &classes) { // O(NlogN + 10n² + 18n + 4)
-    sort(classes.begin(), classes.end(), compare); // sort O(NlogN)
+Result balancedGreedy(vector<Class> &classes) {
+    qsort(&classes[0], classes.size(), sizeof(Class), compare);
     vector<int> classrooms;
     vector<int> classroomsHours;
 
-    for (const Class &classX : classes) { // for normal? O(2n + 2)
-        int classroom = findBalancedClassroom(classrooms, classX.init, classroomsHours); // atribuição + função + acesso * for O(10n² + 6n)
+    for (const Class &classX : classes) {
+        int classroom =
+            findBalancedClassroom(classrooms, classX.init, classroomsHours); // atribuição O(1) + função O(10n + 5) = O(10n + 6)
 
-        if (classroom == -1) { // comparação * for O(n)
-            classrooms.push_back(classX.end); // função + acesso * for O(2n)
-            classroomsHours.push_back(classX.end - classX.init); // função + subtração + 2 acessos O(4n)
+        if (classroom == -1) {
+            classrooms.push_back(classX.end);
+            classroomsHours.push_back(classX.end - classX.init);
         } else {
-            classrooms[classroom] = classX.end; // index + atribuição + acesso * for O(3n)
-            classroomsHours[classroom] += classX.end - classX.init; // index + atribuição + soma + subtração + 2 acessos * for O(6n)
+            classrooms[classroom] = classX.end;
+            classroomsHours[classroom] += classX.end - classX.init;
         }
     }
-    return {classrooms.size(), classroomsHours}; // return + função O(2)
+    return {classrooms.size(), classroomsHours};
 }
 
 int main(int argc, char *argv[]) {
