@@ -29,13 +29,16 @@ struct Class {
     int end;
 };
 
-int compare(const void *a, const void *b) {
-    Class *classA = (Class *)a;
-    Class *classB = (Class *)b;
+// int compare(const void *a, const void *b) {
+//     Class *classA = (Class *)a;
+//     Class *classB = (Class *)b;
 
-    return classA->init - classB->init;
+//     return classA->init - classB->init;
+// }
+
+bool compare(const Class& a, const Class& b) {
+    return a.init < b.init;
 }
-
 struct Result {
     size_t num_classrooms;
     vector<int> classroomsHours;
