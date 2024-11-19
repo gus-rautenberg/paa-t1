@@ -29,6 +29,7 @@ def plot_times(avg_data): # grafico de linha para comparar linha e tamanho
     # plt.title('Tempo de Execução vs. Tamanho')
     plt.legend()
     plt.show()
+    plt.savefig('tempo.png')
 
 def add_labels(bars): 
     for bar in bars:
@@ -58,6 +59,7 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.legend()
     plt.grid(False)
     plt.show()
+    plt.savefig('tempo-elementos.png')
 
     plt.figure(figsize=(10, 6))
     bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Alternativa', color='red')
@@ -73,6 +75,7 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.legend()
     plt.grid(False)
     plt.show()
+    plt.savefig('variancia-elementos.png')
 
 
 file_path = './results.csv'

@@ -149,11 +149,11 @@ Result balancedGreedy(vector<Class> &classes) { // O(NlogN + 10n² + 18n + 4)
 }
 
 int main(int argc, char *argv[]) {
-    // array<int, 27> entradas = {
-    //     10,    25,    50,    100,    150,    200,    300,    500,    750,
-    //     1000,  1500,  2000,  2500,   5000,   7500,   10000,  15000,  20000,
-    //     30000, 50000, 75000, 100000, 150000, 250000, 350000, 500000, 750000};
-    array<int, 1> entradas = {10};
+    array<int, 27> entradas = {
+        10,    25,    50,    100,    150,    200,    300,    500,    750,
+        1000,  1500,  2000,  2500,   5000,   7500,   10000,  15000,  20000,
+        30000, 50000, 75000, 100000, 150000, 250000, 350000, 500000, 750000};
+    // array<int, 1> entradas = {10};
 
     FILE *results = fopen("results.csv", "w");
     if (results == NULL) {
