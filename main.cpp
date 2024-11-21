@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 #include <vector>
 
 using namespace std;
@@ -51,7 +52,9 @@ struct Result {
     vector<int> classroomsHours;
 };
 
-Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
+Result greedy(vector<Class> &classes, std::function<bool(const Classroom &,
+                                                         const Classroom &)>
+                                          compare) { // O(NlogN + 5n² + 6n + 4)
     sort(classes.begin(), classes.end(), Class::compare); // sort O(NlogN)
     // for (auto& Class : classes) {
     //     printf("%d %d\n", Class.init, Class.end);
@@ -59,11 +62,10 @@ Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
     vector<Classroom> classrooms;
     // printf("Greed: \n", classes.size());
 
-
     for (const Class &classX : classes) { // for normal? O(2n + 2)
         if (classrooms.empty()) {
             classrooms.push_back({classX.end, classX.end - classX.init});
-            push_heap(classrooms.begin(), classrooms.end(), Classroom::compare);
+            push_heap(classrooms.begin(), classrooms.end(), compare);
             continue;
             // printf("Vazio\n");
         }
@@ -74,7 +76,7 @@ Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
         Classroom classroom = classrooms.front();
         if (classroom.end > classX.init) {
             classrooms.push_back({classX.end, classX.end - classX.init});
-            push_heap(classrooms.begin(), classrooms.end(), Classroom::compare);
+            push_heap(classrooms.begin(), classrooms.end(), compare);
             // printf("classroom.end > classX.init\n");
             // for(int i = 0; i < classrooms.size(); i++){
             //     printf("%d %d\n", classrooms[i].used, classrooms[i].end);
@@ -82,9 +84,7 @@ Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
             continue;
         }
 
-        
-
-        pop_heap(classrooms.begin(), classrooms.end(), Classroom::compare);
+        pop_heap(classrooms.begin(), classrooms.end(), compare);
         classrooms.pop_back();
         // printf("pop_heap\n");
 
@@ -96,7 +96,7 @@ Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
         classroom.used += classX.end - classX.init;
 
         classrooms.push_back(classroom);
-        push_heap(classrooms.begin(), classrooms.end(), Classroom::compare);
+        push_heap(classrooms.begin(), classrooms.end(), compare);
         // printf("push_heap\n");
         // for(int i = 0; i < classrooms.size(); i++){
         //     printf("%d %d\n", classrooms[i].used, classrooms[i].end);
@@ -107,44 +107,6 @@ Result greedy(vector<Class> &classes) { // O(NlogN + 5n² + 6n + 4)
         classroomHours.push_back(classroom.used);
     }
     // printf("Acabou Greed %d, classrooms.size()\n", classrooms.size());
-    return {classrooms.size(), classroomHours};
-}
-
-Result balancedGreedy(vector<Class> &classes) { // O(NlogN + 10n² + 18n + 4)
-    sort(classes.begin(), classes.end(), Class::compare); // sort O(NlogN)
-    vector<Classroom> classrooms;
-
-    for (const Class &classX : classes) { // for normal? O(2n + 2)
-        if (classrooms.empty()) {
-            classrooms.push_back({classX.end, classX.end - classX.init});
-            push_heap(classrooms.begin(), classrooms.end(),
-                      Classroom::compareBalanced);
-            continue;
-        }
-
-        Classroom classroom = classrooms.front();
-        if (classroom.end > classX.init) {
-            classrooms.push_back({classX.end, classX.end - classX.init});
-            push_heap(classrooms.begin(), classrooms.end(),
-                      Classroom::compareBalanced);
-            continue;
-        }
-
-        pop_heap(classrooms.begin(), classrooms.end(),
-                 Classroom::compareBalanced);
-        classrooms.pop_back();
-
-        classroom.end = classX.end;
-        classroom.used += classX.end - classX.init;
-
-        classrooms.push_back(classroom);
-        push_heap(classrooms.begin(), classrooms.end(),
-                  Classroom::compareBalanced);
-    }
-    std::vector<int> classroomHours;
-    for (Classroom &classroom : classrooms) {
-        classroomHours.push_back(classroom.used);
-    }
     return {classrooms.size(), classroomHours};
 }
 
@@ -191,12 +153,12 @@ int main(int argc, char *argv[]) {
         for (int exec = 0; exec < 6; exec++) {
 
             clock_t begin = clock();
-            Result unbalanced = greedy(classes);
+            Result unbalanced = greedy(classes, Classroom::compare);
             float unbalanced_time = float(clock() - begin) / CLOCKS_PER_SEC;
             float unbalanced_var = variance(unbalanced.classroomsHours);
 
             begin = clock();
-            Result balanced = balancedGreedy(classes);
+            Result balanced = greedy(classes, Classroom::compareBalanced);
             float balanced_time = float(clock() - begin) / CLOCKS_PER_SEC;
             float balanced_var = variance(balanced.classroomsHours);
 
