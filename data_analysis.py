@@ -28,8 +28,8 @@ def plot_times(avg_data): # grafico de linha para comparar linha e tamanho
     plt.ylabel('Tempo de Execução (ms)')
     # plt.title('Tempo de Execução vs. Tamanho')
     plt.legend()
-    plt.show()
     plt.savefig('tempo.png')
+    plt.show()
 
 def add_labels(bars): 
     for bar in bars:
@@ -55,11 +55,12 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.xlabel('N° de elementos')
     plt.ylabel('Tempo de Execução (ms)')
     # plt.title('Tempo de Execução: Alternativa vs. Clássica')
-    plt.xticks(x, avg_data['num_classes'])
+    plt.xticks(x, avg_data['num_classes'], rotation=-90)
     plt.legend()
     plt.grid(False)
-    plt.show()
+    plt.tight_layout()
     plt.savefig('tempo-elementos.png')
+    plt.show()
 
     plt.figure(figsize=(10, 6))
     bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Alternativa', color='red')
@@ -71,11 +72,12 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.xlabel('N° de elementos')
     plt.ylabel('Variância')
     # plt.title('Variância: Alternativa vs. Clássica')
-    plt.xticks(x, avg_data['num_classes'])
+    plt.xticks(x, avg_data['num_classes'], rotation=-90)
     plt.legend()
     plt.grid(False)
-    plt.show()
+    plt.tight_layout()
     plt.savefig('variancia-elementos.png')
+    plt.show()
 
 
 file_path = './results.csv'
