@@ -61,7 +61,7 @@ Result greedy(vector<Class> &classes) {
     int size = 0; // Número atual de salas na fila
 
     for (const Class &classX : classes) {
-        printf("Classe: init = %d, end = %d\n", classX.init, classX.end);
+        // printf("Classe: init = %d, end = %d\n", classX.init, classX.end);
 
         bool allocated = false; // Flag para verificar se a aula foi alocada
         for (int i = 0; i < size; i++) {
@@ -71,7 +71,7 @@ Result greedy(vector<Class> &classes) {
                 classrooms[idx].end = classX.end;
                 classrooms[idx].used += classX.end - classX.init;
                 tasksPerClassroom[idx].push_back(classX); // Adiciona a aula à sala
-                printf("Alocada na sala %d (existente): init = %d, end = %d\n", idx + 1, classX.init, classX.end);
+                // printf("Alocada na sala %d (existente): init = %d, end = %d\n", idx + 1, classX.init, classX.end);
                 allocated = true;
                 break;
             }
@@ -80,7 +80,7 @@ Result greedy(vector<Class> &classes) {
         if (!allocated) { // Se não foi possível alocar em nenhuma sala existente
             classrooms[rear] = {classX.end, classX.end - classX.init};
             tasksPerClassroom[rear].push_back(classX); // Adiciona a aula à nova sala
-            printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
+            // printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
             rear = (rear + 1) % MAX_CLASSROOMS; // Incrementa circularmente
             size++;
         }
@@ -92,9 +92,9 @@ Result greedy(vector<Class> &classes) {
         int idx = (front + i) % MAX_CLASSROOMS;
         classroomHours.push_back(classrooms[idx].used);
 
-        printf("Sala %d:\n", idx + 1);
+        // printf("Sala %d:\n", idx + 1);
         for (const Class &task : tasksPerClassroom[idx]) {
-            printf("  Tarefa: init = %d, end = %d\n", task.init, task.end);
+            // printf("  Tarefa: init = %d, end = %d\n", task.init, task.end);
         }
     }
 
@@ -111,7 +111,7 @@ Result balancedGreedy(vector<Class> &classes) {
     int size = 0; // Número atual de salas na fila
 
     for (const Class &classX : classes) {
-        printf("Classe: init = %d, end = %d\n", classX.init, classX.end);
+        // printf("Classe: init = %d, end = %d\n", classX.init, classX.end);
 
         bool allocated = false; // Flag para verificar se a aula foi alocada
         int bestIdx = -1;
@@ -129,14 +129,14 @@ Result balancedGreedy(vector<Class> &classes) {
             classrooms[bestIdx].end = classX.end;
             classrooms[bestIdx].used += classX.end - classX.init;
             tasksPerClassroom[bestIdx].push_back(classX); // Adiciona a aula à sala
-            printf("Alocada na sala %d (existente): init = %d, end = %d\n", bestIdx + 1, classX.init, classX.end);
+            // printf("Alocada na sala %d (existente): init = %d, end = %d\n", bestIdx + 1, classX.init, classX.end);
             allocated = true;
         }
 
         if (!allocated) { // Se não foi possível alocar em nenhuma sala existente
             classrooms[rear] = {classX.end, classX.end - classX.init};
             tasksPerClassroom[rear].push_back(classX); // Adiciona a aula à nova sala
-            printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
+            // printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
             rear = (rear + 1) % MAX_CLASSROOMS; // Incrementa circularmente
             size++;
         }
@@ -148,9 +148,9 @@ Result balancedGreedy(vector<Class> &classes) {
         int idx = (front + i) % MAX_CLASSROOMS;
         classroomHours.push_back(classrooms[idx].used);
 
-        printf("Sala %d:\n", idx + 1);
+        // printf("Sala %d:\n", idx + 1);
         for (const Class &task : tasksPerClassroom[idx]) {
-            printf("  Tarefa: init = %d, end = %d\n", task.init, task.end);
+            // printf("  Tarefa: init = %d, end = %d\n", task.init, task.end);
         }
     }
 
@@ -159,13 +159,13 @@ Result balancedGreedy(vector<Class> &classes) {
 
 
 int main(int argc, char *argv[]) {
-    // array<int, 27> entradas = {
-    //     10,    25,    50,    100,    150,    200,    300,    500,    750,
-    //     1000,  1500,  2000,  2500,   5000,   7500,   10000,  15000,  20000,
-    //     30000, 50000, 75000, 100000, 150000, 250000, 350000, 500000, 750000};
-    array<int, 1> entradas = {10};
+    array<int, 27> entradas = {
+        10,    25,    50,    100,    150,    200,    300,    500,    750,
+        1000,  1500,  2000,  2500,   5000,   7500,   10000,  15000,  20000,
+        30000, 50000, 75000, 100000, 150000, 250000, 350000, 500000, 750000};
+    // array<int, 1> entradas = {10};
 
-    FILE *results = fopen("results.csv", "w");
+    FILE *results = fopen("resultsCircular.csv", "w");
     if (results == NULL) {
         fprintf(stderr, "Não pôde criar 'results.csv'\n");
         return 1;
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
             "num_classes,unbalanced_time,unbalanced_var,balanced_time,balanced_"
             "var\n");
     for (const int &num_classes : entradas) {
-        printf("%7d classes", num_classes);
+        // printf("%7d classes", num_classes);
 
         char input_filename[32];
         sprintf(input_filename, "entradas/Aula%u.txt", num_classes);
