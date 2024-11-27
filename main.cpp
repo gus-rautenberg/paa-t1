@@ -51,12 +51,11 @@ struct Result {
     vector<int> classroomsHours;
 };
 
-Result greedy(vector<Class> &classes) {
+Result greedy(vector<Class> &classes, int max_classrooms) {
     sort(classes.begin(), classes.end(), Class::compare); // Ordena as classes
 
-    constexpr int MAX_CLASSROOMS = 10; // Tamanho máximo da fila circular
-    Classroom classrooms[MAX_CLASSROOMS]; // Fila circular
-    vector<vector<Class>> tasksPerClassroom(MAX_CLASSROOMS); // Aulas por sala
+    vector<Classroom> classrooms(max_classrooms); // Vetor dinâmico
+    vector<vector<Class>> tasksPerClassroom(max_classrooms); // Aulas por sala
     int front = 0, rear = 0; // Ponteiros da fila circular
     int size = 0; // Número atual de salas na fila
 
@@ -65,7 +64,7 @@ Result greedy(vector<Class> &classes) {
 
         bool allocated = false; // Flag para verificar se a aula foi alocada
         for (int i = 0; i < size; i++) {
-            int idx = (front + i) % MAX_CLASSROOMS; // Índice circular
+            int idx = (front + i) % max_classrooms; // Índice circular
             if (classrooms[idx].end <= classX.init) {
                 // Atualiza a sala existente
                 classrooms[idx].end = classX.end;
@@ -81,7 +80,7 @@ Result greedy(vector<Class> &classes) {
             classrooms[rear] = {classX.end, classX.end - classX.init};
             tasksPerClassroom[rear].push_back(classX); // Adiciona a aula à nova sala
             printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
-            rear = (rear + 1) % MAX_CLASSROOMS; // Incrementa circularmente
+            rear = (rear + 1) % max_classrooms; // Incrementa circularmente
             size++;
         }
     }
@@ -89,7 +88,7 @@ Result greedy(vector<Class> &classes) {
     // Calcula o número total de horas por sala e imprime as tarefas alocadas
     std::vector<int> classroomHours;
     for (int i = 0; i < size; i++) {
-        int idx = (front + i) % MAX_CLASSROOMS;
+        int idx = (front + i) % max_classrooms;
         classroomHours.push_back(classrooms[idx].used);
 
         printf("Sala %d:\n", idx + 1);
@@ -101,12 +100,11 @@ Result greedy(vector<Class> &classes) {
     return {static_cast<size_t>(size), classroomHours};
 }
 
-Result balancedGreedy(vector<Class> &classes) {
+Result balancedGreedy(vector<Class> &classes, int max_classrooms) {
     sort(classes.begin(), classes.end(), Class::compare); // Ordena as classes
 
-    constexpr int MAX_CLASSROOMS = 10; // Tamanho máximo da fila circular
-    Classroom classrooms[MAX_CLASSROOMS]; // Fila circular
-    vector<vector<Class>> tasksPerClassroom(MAX_CLASSROOMS); // Aulas por sala
+    vector<Classroom> classrooms(max_classrooms); // Vetor dinâmico
+    vector<vector<Class>> tasksPerClassroom(max_classrooms); // Aulas por sala
     int front = 0, rear = 0; // Ponteiros da fila circular
     int size = 0; // Número atual de salas na fila
 
@@ -118,7 +116,7 @@ Result balancedGreedy(vector<Class> &classes) {
         int minLoad = INT_MAX;
 
         for (int i = 0; i < size; i++) {
-            int idx = (front + i) % MAX_CLASSROOMS; // Índice circular
+            int idx = (front + i) % max_classrooms; // Índice circular
             if (classrooms[idx].end <= classX.init && classrooms[idx].used < minLoad) {
                 bestIdx = idx;       // Seleciona a sala com menor carga
                 minLoad = classrooms[idx].used;
@@ -137,7 +135,7 @@ Result balancedGreedy(vector<Class> &classes) {
             classrooms[rear] = {classX.end, classX.end - classX.init};
             tasksPerClassroom[rear].push_back(classX); // Adiciona a aula à nova sala
             printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
-            rear = (rear + 1) % MAX_CLASSROOMS; // Incrementa circularmente
+            rear = (rear + 1) % max_classrooms; // Incrementa circularmente
             size++;
         }
     }
@@ -145,7 +143,7 @@ Result balancedGreedy(vector<Class> &classes) {
     // Calcula o número total de horas por sala e imprime as tarefas alocadas
     std::vector<int> classroomHours;
     for (int i = 0; i < size; i++) {
-        int idx = (front + i) % MAX_CLASSROOMS;
+        int idx = (front + i) % max_classrooms;
         classroomHours.push_back(classrooms[idx].used);
 
         printf("Sala %d:\n", idx + 1);
@@ -159,11 +157,11 @@ Result balancedGreedy(vector<Class> &classes) {
 
 
 int main(int argc, char *argv[]) {
-    // array<int, 27> entradas = {
-    //     10,    25,    50,    100,    150,    200,    300,    500,    750,
-    //     1000,  1500,  2000,  2500,   5000,   7500,   10000,  15000,  20000,
-    //     30000, 50000, 75000, 100000, 150000, 250000, 350000, 500000, 750000};
-    array<int, 1> entradas = {10};
+    array<int, 27> entradas = {
+        10,    25,    50,    100,    150,    200,    300,    500,    750,
+        1000,  1500,  2000,  2500,   5000,   7500,   10000,  15000,  20000,
+        30000, 50000, 75000, 100000, 150000, 250000, 350000, 500000, 750000};
+    // array<int, 1> entradas = {10};
 
     FILE *results = fopen("results.csv", "w");
     if (results == NULL) {
@@ -172,8 +170,8 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(results,
-            "num_classes,unbalanced_time,unbalanced_var,balanced_time,balanced_"
-            "var\n");
+            "num_classes,unbalanced_time,unbalanced_var,balanced_time,balanced_var\n");
+
     for (const int &num_classes : entradas) {
         printf("%7d classes", num_classes);
 
@@ -198,21 +196,21 @@ int main(int argc, char *argv[]) {
         }
         fclose(input_file);
 
-        for (int exec = 0; exec < 6; exec++) {
+        // Determinar MAX_CLASSROOMS dinamicamente
+        int max_classrooms = (num_classes < 100) ? 10 : (num_classes / 10);
 
+        for (int exec = 0; exec < 6; exec++) {
             clock_t begin = clock();
-            Result unbalanced = greedy(classes);
+            Result unbalanced = greedy(classes, max_classrooms);
             float unbalanced_time = float(clock() - begin) / CLOCKS_PER_SEC;
             float unbalanced_var = variance(unbalanced.classroomsHours);
 
             begin = clock();
-            Result balanced = balancedGreedy(classes);
+            Result balanced = balancedGreedy(classes, max_classrooms);
             float balanced_time = float(clock() - begin) / CLOCKS_PER_SEC;
             float balanced_var = variance(balanced.classroomsHours);
 
             printf(" ..%d", exec + 1);
-            /*printf("\nun: %zu , bl: %zu", unbalanced.numClassrooms,*/
-            /*       balanced.numClassrooms);*/
             fflush(stdout);
 
             if (exec != 0) {
@@ -225,4 +223,5 @@ int main(int argc, char *argv[]) {
         printf("\n");
     }
     fclose(results);
+    return 0;
 }
