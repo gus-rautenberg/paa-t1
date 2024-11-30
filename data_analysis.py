@@ -29,7 +29,7 @@ def plot_times(avg_data): # grafico de linha para comparar linha e tamanho
     plt.ylabel('Tempo de Execução (ms)')
     # plt.title('Tempo de Execução vs. Tamanho')
     plt.legend()
-    plt.savefig('tempo.png')
+    plt.savefig('new_tempo.png')
     plt.show()
 
 def add_labels(bars): 
@@ -60,7 +60,7 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.legend()
     plt.grid(False)
     plt.tight_layout()
-    plt.savefig('tempo-elementos.png')
+    plt.savefig('new_tempo-elementos.png')
     plt.show()
 
     plt.figure(figsize=(10, 6))
@@ -77,7 +77,7 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.legend()
     plt.grid(False)
     plt.tight_layout()
-    plt.savefig('variancia-elementos.png')
+    plt.savefig('new_variancia-elementos.png')
     plt.show()
 
 
