@@ -19,10 +19,10 @@ def plot_times(avg_data): # grafico de linha para comparar linha e tamanho
 
     plt.figure(figsize=(10, 6))
     
-    plt.plot(avg_data['num_classes'], avg_data['unbalanced_time'], marker='o', label='Alternativa', color='red')
+    plt.plot(avg_data['num_classes'], avg_data['unbalanced_time'], marker='o', label='Clássica', color='red')
     # add_labels_line(avg_data['num_classes'], avg_data['unbalanced_time'], 'black')
     
-    plt.plot(avg_data['num_classes'], avg_data['balanced_time'], marker='o', label='Clássica', color='green')
+    plt.plot(avg_data['num_classes'], avg_data['balanced_time'], marker='o', label='Alternativa', color='green')
     # add_labels_line(avg_data['num_classes'], avg_data['balanced_time'], 'black')
     
     plt.xlabel('N° de elementos')
@@ -47,8 +47,8 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     bar_width = 0.35
     x = np.arange(len(avg_data['num_classes']))
     
-    bars1 = plt.bar(x - bar_width/2, avg_data['unbalanced_time'], bar_width, label='Alternativa', color='red')
-    bars2 = plt.bar(x + bar_width/2, avg_data['balanced_time'], bar_width, label='Clássica', color='green')
+    bars1 = plt.bar(x - bar_width/2, avg_data['unbalanced_time'], bar_width, label='Clássica', color='red')
+    bars2 = plt.bar(x + bar_width/2, avg_data['balanced_time'], bar_width, label='Alternativa', color='green')
     
     # add_labels(bars1)
     # add_labels(bars2)
@@ -64,8 +64,8 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.show()
 
     plt.figure(figsize=(10, 6))
-    bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Alternativa', color='red')
-    bars4 = plt.bar(x + bar_width/2, avg_data['balanced_var'], bar_width, label='Clássica', color='green')
+    bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Clássica', color='red')
+    bars4 = plt.bar(x + bar_width/2, avg_data['balanced_var'], bar_width, label='Alternativa', color='green')
     
     # add_labels(bars3)
     # add_labels(bars4)
