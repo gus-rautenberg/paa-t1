@@ -6,7 +6,8 @@ import numpy as np
 def process_data(file_path):
     df = pd.read_csv(file_path)
     avg_data = df.groupby('num_classes').mean().reset_index()
-
+    avg_data['unbalanced_var'] = np.sqrt(avg_data['unbalanced_var'])
+    avg_data['balanced_var'] = np.sqrt(avg_data['balanced_var'])
     return avg_data
 
 def add_labels_line(x, y, color):
@@ -28,9 +29,18 @@ def plot_times(avg_data): # grafico de linha para comparar linha e tamanho
     plt.ylabel('Tempo de Execução (ms)')
     # plt.title('Tempo de Execução vs. Tamanho')
     plt.legend()
-    plt.savefig('tempo.png')
+    plt.savefig('Circular_Queue_tempo.png')
     plt.show()
 
+def add_labels(bars): 
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            height,
+            f'{height:.2f}',
+            ha='center', va='bottom', fontsize=10
+        )
 def plot_times_10000(avg_data):
     import matplotlib.pyplot as plt
     
@@ -48,19 +58,8 @@ def plot_times_10000(avg_data):
     plt.legend()
     
     # Salvar e exibir o gráfico
-    plt.savefig('tempo2500.png')
+    plt.savefig('Circular_Queue_tempo2500.png')
     plt.show()
-
-def add_labels(bars): 
-    
-    for bar in bars:
-        height = bar.get_height()
-        plt.text(
-            bar.get_x() + bar.get_width() / 2,
-            height,
-            f'{height:.2f}',
-            ha='center', va='bottom', fontsize=10
-        )
 
 def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.figure(figsize=(10, 6))
@@ -80,9 +79,25 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.legend()
     plt.grid(False)
     plt.tight_layout()
-    plt.savefig('tempo-elementos.png')
+    plt.savefig('Circular_Queue_elementos.png')
     plt.show()
 
+    plt.figure(figsize=(10, 6))
+    bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Clássica', color='red')
+    bars4 = plt.bar(x + bar_width/2, avg_data['balanced_var'], bar_width, label='Alternativa', color='green')
+    
+    # add_labels(bars3)
+    # add_labels(bars4)
+
+    plt.xlabel('N° de elementos')
+    plt.ylabel('Variância')
+    # plt.title('Variância: Alternativa vs. Clássica')
+    plt.xticks(x, avg_data['num_classes'], rotation=-90)
+    plt.legend()
+    plt.grid(False)
+    plt.tight_layout()
+    plt.savefig('Circular_Queue__variancia-elementos.png')
+    plt.show()
 
     filtered_data = avg_data[avg_data['num_classes'] <= 2500]
     x_filtered = np.arange(len(filtered_data['num_classes']))
@@ -102,25 +117,9 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.legend()
     plt.grid(False)
     plt.tight_layout()
-    plt.savefig('variancia-elementos2500.png')
+    plt.savefig('Circular_Queue_variancia-elementos2500.png')
     plt.show()
 
-    plt.figure(figsize=(10, 6))
-    bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Clássica', color='red')
-    bars4 = plt.bar(x + bar_width/2, avg_data['balanced_var'], bar_width, label='Alternativa', color='green')
-    
-    # add_labels(bars3)
-    # add_labels(bars4)
-
-    plt.xlabel('N° de elementos')
-    plt.ylabel('Variância')
-    # plt.title('Variância: Alternativa vs. Clássica')
-    plt.xticks(x, avg_data['num_classes'], rotation=-90)
-    plt.legend()
-    plt.grid(False)
-    plt.tight_layout()
-    plt.savefig('variancia-elementos.png')
-    plt.show()
 
 
 file_path = './resultsCircular.csv'
@@ -129,4 +128,5 @@ avg_data = process_data(file_path)
 plot_times(avg_data)
 plot_times_10000(avg_data)
 plot_absolute_values(avg_data)
+
 
