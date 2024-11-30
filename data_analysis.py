@@ -1,15 +1,15 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Carregar os dados dos arquivos CSV
 heap_data = pd.read_csv('results.csv')
 circular_data = pd.read_csv('resultsCircular.csv')
 
-# Calcular o desvio padrão a partir da variância (sqrt(variância))
-heap_data['unbalanced_std'] = heap_data['unbalanced_var'] ** 0.5
-heap_data['balanced_std'] = heap_data['balanced_var'] ** 0.5
-circular_data['unbalanced_std'] = circular_data['unbalanced_var'] ** 0.5
-circular_data['balanced_std'] = circular_data['balanced_var'] ** 0.5
+heap_data['unbalanced_std'] = np.sqrt(heap_data['unbalanced_var'])
+heap_data['balanced_std'] = np.sqrt(heap_data['balanced_var'])
+circular_data['unbalanced_std'] = np.sqrt(circular_data['unbalanced_var'])
+circular_data['balanced_std'] = np.sqrt(circular_data['balanced_var'])
 
 # Comparação entre Heap e Fila Circular
 def plot_comparison(data1, label1, data2, label2, column, title, ylabel):
