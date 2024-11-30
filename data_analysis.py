@@ -7,7 +7,7 @@ def process_data(file_path):
     df = pd.read_csv(file_path)
     avg_data = df.groupby('num_classes').mean().reset_index()
     avg_data['unbalanced_var'] = np.sqrt(avg_data['unbalanced_var'])
-    avg_data['balanced_time'] = np.sqrt(avg_data['balanced_time'])
+    avg_data['balanced_var'] = np.sqrt(avg_data['balanced_var'])
     return avg_data
 
 def add_labels_line(x, y, color):
@@ -41,6 +41,25 @@ def add_labels(bars):
             f'{height:.2f}',
             ha='center', va='bottom', fontsize=10
         )
+def plot_times_10000(avg_data):
+    import matplotlib.pyplot as plt
+    
+    # Filtrar até num_classes = 10000
+    filtered_data = avg_data[avg_data['num_classes'] <= 2500]
+    
+    plt.figure(figsize=(10, 6))
+    
+    # Plotar os tempos da linha Clássica e Alternativa
+    plt.plot(filtered_data['num_classes'], filtered_data['unbalanced_time'], marker='o', label='Clássica', color='red')
+    plt.plot(filtered_data['num_classes'], filtered_data['balanced_time'], marker='o', label='Alternativa', color='green')
+    
+    plt.xlabel('N° de elementos')
+    plt.ylabel('Tempo de Execução (ms)')
+    plt.legend()
+    
+    # Salvar e exibir o gráfico
+    plt.savefig('tempo2500.png')
+    plt.show()
 
 def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.figure(figsize=(10, 6))
@@ -80,10 +99,34 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     plt.savefig('new_variancia-elementos.png')
     plt.show()
 
+    filtered_data = avg_data[avg_data['num_classes'] <= 2500]
+    x_filtered = np.arange(len(filtered_data['num_classes']))
+
+    plt.figure(figsize=(10, 6))
+
+    bars5 = plt.bar(x_filtered - bar_width/2, filtered_data['unbalanced_var'], bar_width, label='Clássica', color='red')
+    bars6 = plt.bar(x_filtered + bar_width/2, filtered_data['balanced_var'], bar_width, label='Alternativa', color='green')
+    
+    # add_labels(bars3)
+    # add_labels(bars4)
+
+    plt.xlabel('N° de elementos')
+    plt.ylabel('Variância')
+    # plt.title('Variância: Alternativa vs. Clássica')
+    plt.xticks(x_filtered, filtered_data['num_classes'], rotation=-90)
+    plt.legend()
+    plt.grid(False)
+    plt.tight_layout()
+    plt.savefig('variancia-elementos2500.png')
+    plt.show()
+
+
 
 file_path = './results.csv'
 avg_data = process_data(file_path)
 
 plot_times(avg_data)
+plot_times_10000(avg_data)
 plot_absolute_values(avg_data)
+
 
