@@ -6,7 +6,8 @@ import numpy as np
 def process_data(file_path):
     df = pd.read_csv(file_path)
     avg_data = df.groupby('num_classes').mean().reset_index()
-
+    avg_data['unbalanced_var'] = np.sqrt(avg_data['unbalanced_var'])
+    avg_data['balanced_time'] = np.sqrt(avg_data['balanced_time'])
     return avg_data
 
 def add_labels_line(x, y, color):
