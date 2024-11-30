@@ -1,132 +1,61 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import numpy as np
 
-def process_data(file_path):
-    df = pd.read_csv(file_path)
-    avg_data = df.groupby('num_classes').mean().reset_index()
-    avg_data['unbalanced_var'] = np.sqrt(avg_data['unbalanced_var'])
-    avg_data['balanced_var'] = np.sqrt(avg_data['balanced_var'])
-    return avg_data
+# Carregar os dados dos arquivos CSV
+heap_data = pd.read_csv('results.csv')
+circular_data = pd.read_csv('resultsCircular.csv')
 
-def add_labels_line(x, y, color):
-    for i in range(len(x)):
-        plt.text(x[i], y[i], f'{y[i]:.2f}', ha='center', va='bottom', fontsize=10, color=color)
+# Calcular o desvio padrão a partir da variância (sqrt(variância))
+heap_data['unbalanced_std'] = heap_data['unbalanced_var'] ** 0.5
+heap_data['balanced_std'] = heap_data['balanced_var'] ** 0.5
+circular_data['unbalanced_std'] = circular_data['unbalanced_var'] ** 0.5
+circular_data['balanced_std'] = circular_data['balanced_var'] ** 0.5
 
-
-def plot_times(avg_data): # grafico de linha para comparar linha e tamanho
-
+# Comparação entre Heap e Fila Circular
+def plot_comparison(data1, label1, data2, label2, column, title, ylabel):
     plt.figure(figsize=(10, 6))
-    
-    plt.plot(avg_data['num_classes'], avg_data['unbalanced_time'], marker='o', label='Clássica', color='red')
-    # add_labels_line(avg_data['num_classes'], avg_data['unbalanced_time'], 'black')
-    
-    plt.plot(avg_data['num_classes'], avg_data['balanced_time'], marker='o', label='Alternativa', color='green')
-    # add_labels_line(avg_data['num_classes'], avg_data['balanced_time'], 'black')
-    
-    plt.xlabel('N° de elementos')
-    plt.ylabel('Tempo de Execução (ms)')
-    # plt.title('Tempo de Execução vs. Tamanho')
+    plt.plot(data1['num_classes'], data1[column], label=label1, marker='o')
+    plt.plot(data2['num_classes'], data2[column], label=label2, marker='o')
+    plt.xlabel('Número de Classes')
+    plt.ylabel(ylabel)
     plt.legend()
-    plt.savefig('Circular_Queue_tempo.png')
-    plt.show()
-
-def add_labels(bars): 
-    for bar in bars:
-        height = bar.get_height()
-        plt.text(
-            bar.get_x() + bar.get_width() / 2,
-            height,
-            f'{height:.2f}',
-            ha='center', va='bottom', fontsize=10
-        )
-def plot_times_10000(avg_data):
-    import matplotlib.pyplot as plt
-    
-    # Filtrar até num_classes = 10000
-    filtered_data = avg_data[avg_data['num_classes'] <= 2500]
-    
-    plt.figure(figsize=(10, 6))
-    
-    # Plotar os tempos da linha Clássica e Alternativa
-    plt.plot(filtered_data['num_classes'], filtered_data['unbalanced_time'], marker='o', label='Clássica', color='red')
-    plt.plot(filtered_data['num_classes'], filtered_data['balanced_time'], marker='o', label='Alternativa', color='green')
-    
-    plt.xlabel('N° de elementos')
-    plt.ylabel('Tempo de Execução (ms)')
-    plt.legend()
-    
-    # Salvar e exibir o gráfico
-    plt.savefig('Circular_Queue_tempo2500.png')
-    plt.show()
-
-def plot_absolute_values(avg_data): # barras para tempo e Desvio Padrão
-    plt.figure(figsize=(10, 6))
-    bar_width = 0.35
-    x = np.arange(len(avg_data['num_classes']))
-    
-    bars1 = plt.bar(x - bar_width/2, avg_data['unbalanced_time'], bar_width, label='Clássica', color='red')
-    bars2 = plt.bar(x + bar_width/2, avg_data['balanced_time'], bar_width, label='Alternativa', color='green')
-    
-    # add_labels(bars1)
-    # add_labels(bars2)
-
-    plt.xlabel('N° de elementos')
-    plt.ylabel('Tempo de Execução (ms)')
-    # plt.title('Tempo de Execução: Alternativa vs. Clássica')
-    plt.xticks(x, avg_data['num_classes'], rotation=-90)
-    plt.legend()
-    plt.grid(False)
-    plt.tight_layout()
-    plt.savefig('Circular_Queue_elementos.png')
-    plt.show()
-
-    plt.figure(figsize=(10, 6))
-    bars3 = plt.bar(x - bar_width/2, avg_data['unbalanced_var'], bar_width, label='Clássica', color='red')
-    bars4 = plt.bar(x + bar_width/2, avg_data['balanced_var'], bar_width, label='Alternativa', color='green')
-    
-    # add_labels(bars3)
-    # add_labels(bars4)
-
-    plt.xlabel('N° de elementos')
-    plt.ylabel('Desvio Padrão')
-    # plt.title('Desvio Padrão: Alternativa vs. Clássica')
-    plt.xticks(x, avg_data['num_classes'], rotation=-90)
-    plt.legend()
-    plt.grid(False)
-    plt.tight_layout()
-    plt.savefig('Circular_Queue__variancia-elementos.png')
-    plt.show()
-
-    filtered_data = avg_data[avg_data['num_classes'] <= 2500]
-    x_filtered = np.arange(len(filtered_data['num_classes']))
-
-    plt.figure(figsize=(10, 6))
-
-    bars5 = plt.bar(x_filtered - bar_width/2, filtered_data['unbalanced_var'], bar_width, label='Clássica', color='red')
-    bars6 = plt.bar(x_filtered + bar_width/2, filtered_data['balanced_var'], bar_width, label='Alternativa', color='green')
-    
-    # add_labels(bars3)
-    # add_labels(bars4)
-
-    plt.xlabel('N° de elementos')
-    plt.ylabel('Desvio Padrão')
-    # plt.title('Desvio Padrão: Alternativa vs. Clássica')
-    plt.xticks(x_filtered, filtered_data['num_classes'], rotation=-90)
-    plt.legend()
-    plt.grid(False)
-    plt.tight_layout()
-    plt.savefig('Circular_Queue_variancia-elementos2500.png')
+    plt.grid(True)
+    plt.savefig(f'{title}.png')
     plt.show()
 
 
+# Gráfico 1: Comparação do Tempo Médio (Unbalanced)
+plot_comparison(
+    heap_data, 'Heap (Clássica)',
+    circular_data, 'Fila Circular (Clássica)',
+    'unbalanced_time',
+    'Comparação do Tempo Médio - Estratégia Clássica',
+    'Tempo Médio (s)'
+)
 
-file_path = './resultsCircular.csv'
-avg_data = process_data(file_path)
+# Gráfico 2: Comparação do Tempo Médio (Balanced)
+plot_comparison(
+    heap_data, 'Heap (Alternativa)',
+    circular_data, 'Fila Circular (Alternativa)',
+    'balanced_time',
+    'Comparação do Tempo Médio - Estratégia Alternativa',
+    'Tempo Médio (s)'
+)
 
-plot_times(avg_data)
-plot_times_10000(avg_data)
-plot_absolute_values(avg_data)
+# Gráfico 3: Comparação do Balanceamento (Desvio Padrão - Unbalanced)
+plot_comparison(
+    heap_data, 'Heap (Clássica)',
+    circular_data, 'Fila Circular (Clássica)',
+    'unbalanced_std',
+    'Comparação do Balanceamento - Estratégia Clássica (Desvio Padrão)',
+    'Desvio Padrão'
+)
 
-
+# Gráfico 4: Comparação do Balanceamento (Desvio Padrão - Balanced)
+plot_comparison(
+    heap_data, 'Heap (Alternativa)',
+    circular_data, 'Fila Circular (Alternativa)',
+    'balanced_std',
+    'Comparação do Balanceamento - Estratégia Alternativa (Desvio Padrão)',
+    'Desvio Padrão'
+)
