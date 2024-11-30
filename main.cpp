@@ -59,100 +59,94 @@ Result greedy(vector<Class> &classes, int max_classrooms) {
     int front = 0, rear = 0; // Ponteiros da fila circular
     int size = 0; // Número atual de salas na fila
 
-    for (const Class &classX : classes) {
-        printf("Classe: init = %d, end = %d\n", classX.init, classX.end);
-
-        bool allocated = false; // Flag para verificar se a aula foi alocada
-        for (int i = 0; i < size; i++) {
-            int idx = (front + i) % max_classrooms; // Índice circular
-            if (classrooms[idx].end <= classX.init) {
-                // Atualiza a sala existente
-                classrooms[idx].end = classX.end;
-                classrooms[idx].used += classX.end - classX.init;
-                tasksPerClassroom[idx].push_back(classX); // Adiciona a aula à sala
-                printf("Alocada na sala %d (existente): init = %d, end = %d\n", idx + 1, classX.init, classX.end);
-                allocated = true;
-                break;
-            }
+    for (const Class &classX : classes) { // for normal? O(2n + 2)
+        if (classrooms.empty()) { // n
+            classrooms.push_back({classX.end, classX.end - classX.init}); // 5n
+            push_heap(classrooms.begin(), classrooms.end(), Classroom::compare); // nlogn
+            continue; //n
+            // printf("Vazio\n");
         }
 
-        if (!allocated) { // Se não foi possível alocar em nenhuma sala existente
-            classrooms[rear] = {classX.end, classX.end - classX.init};
-            tasksPerClassroom[rear].push_back(classX); // Adiciona a aula à nova sala
-            printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
-            rear = (rear + 1) % max_classrooms; // Incrementa circularmente
-            size++;
+        // for(int i = 0; i < classrooms.size(); i++){
+        //     printf("%d %d\n", classrooms[i].used, classrooms[i].end);
+        // }
+        Classroom classroom = classrooms.front(); // 2n
+        if (classroom.end > classX.init) { // 3n
+            classrooms.push_back({classX.end, classX.end - classX.init}); // 5n
+            push_heap(classrooms.begin(), classrooms.end(), Classroom::compare); // nlogn
+            // printf("classroom.end > classX.init\n");
+            // for(int i = 0; i < classrooms.size(); i++){
+            //     printf("%d %d\n", classrooms[i].used, classrooms[i].end);
+            // }
+            continue; // n
         }
+
+        
+
+        pop_heap(classrooms.begin(), classrooms.end(), Classroom::compare); // nlogn
+        classrooms.pop_back(); // 1n
+        // printf("pop_heap\n");
+
+        // for(int i = 0; i < classrooms.size(); i++){
+        //     printf("%d %d\n", classrooms[i].used, classrooms[i].end);
+        // }
+
+        classroom.end = classX.end; // 3n
+        classroom.used += classX.end - classX.init; // 6n
+
+        classrooms.push_back(classroom); // 1n
+        push_heap(classrooms.begin(), classrooms.end(), Classroom::compare); // nlogn
+        // printf("push_heap\n");
+        // for(int i = 0; i < classrooms.size(); i++){
+        //     printf("%d %d\n", classrooms[i].used, classrooms[i].end);
+        // }
     }
 
     // Calcula o número total de horas por sala e imprime as tarefas alocadas
     std::vector<int> classroomHours;
-    for (int i = 0; i < size; i++) {
-        int idx = (front + i) % max_classrooms;
-        classroomHours.push_back(classrooms[idx].used);
-
-        printf("Sala %d:\n", idx + 1);
-        for (const Class &task : tasksPerClassroom[idx]) {
-            printf("  Tarefa: init = %d, end = %d\n", task.init, task.end);
-        }
+    for (Classroom &classroom : classrooms) { // 2n + 2
+        classroomHours.push_back(classroom.used); // 2n
     }
-
-    return {static_cast<size_t>(size), classroomHours};
+    // printf("Acabou Greed %d, classrooms.size()\n", classrooms.size());
+    return {classrooms.size(), classroomHours}; // 1
 }
 
-Result balancedGreedy(vector<Class> &classes, int max_classrooms) {
-    sort(classes.begin(), classes.end(), Class::compare); // Ordena as classes
+Result balancedGreedy(vector<Class> &classes) { // O(NlogN + 10n² + 18n + 4)
+    sort(classes.begin(), classes.end(), Class::compare); // sort O(NlogN)
+    vector<Classroom> classrooms;
 
-    vector<Classroom> classrooms(max_classrooms); // Vetor dinâmico
-    vector<vector<Class>> tasksPerClassroom(max_classrooms); // Aulas por sala
-    int front = 0, rear = 0; // Ponteiros da fila circular
-    int size = 0; // Número atual de salas na fila
-
-    for (const Class &classX : classes) {
-        printf("Classe: init = %d, end = %d\n", classX.init, classX.end);
-
-        bool allocated = false; // Flag para verificar se a aula foi alocada
-        int bestIdx = -1;
-        int minLoad = INT_MAX;
-
-        for (int i = 0; i < size; i++) {
-            int idx = (front + i) % max_classrooms; // Índice circular
-            if (classrooms[idx].end <= classX.init && classrooms[idx].used < minLoad) {
-                bestIdx = idx;       // Seleciona a sala com menor carga
-                minLoad = classrooms[idx].used;
-            }
+    for (const Class &classX : classes) { // for normal? O(2n + 2)
+        if (classrooms.empty()) { // n
+            classrooms.push_back({classX.end, classX.end - classX.init}); // 5n
+            push_heap(classrooms.begin(), classrooms.end(), // nlogn
+                      Classroom::compareBalanced);
+            continue; //n
         }
 
-        if (bestIdx != -1) { // Sala encontrada para alocar
-            classrooms[bestIdx].end = classX.end;
-            classrooms[bestIdx].used += classX.end - classX.init;
-            tasksPerClassroom[bestIdx].push_back(classX); // Adiciona a aula à sala
-            printf("Alocada na sala %d (existente): init = %d, end = %d\n", bestIdx + 1, classX.init, classX.end);
-            allocated = true;
+        Classroom classroom = classrooms.front(); // 2n
+        if (classroom.end > classX.init) { // 3n
+            classrooms.push_back({classX.end, classX.end - classX.init}); // 5n
+            push_heap(classrooms.begin(), classrooms.end(),
+                      Classroom::compareBalanced); // nlogn
+            continue; // n
         }
 
-        if (!allocated) { // Se não foi possível alocar em nenhuma sala existente
-            classrooms[rear] = {classX.end, classX.end - classX.init};
-            tasksPerClassroom[rear].push_back(classX); // Adiciona a aula à nova sala
-            printf("Alocada na sala %d (nova): init = %d, end = %d\n", rear + 1, classX.init, classX.end);
-            rear = (rear + 1) % max_classrooms; // Incrementa circularmente
-            size++;
-        }
+        pop_heap(classrooms.begin(), classrooms.end(),
+                 Classroom::compareBalanced); // nlogn
+        classrooms.pop_back(); // 1n
+
+        classroom.end = classX.end; // 3n
+        classroom.used += classX.end - classX.init; // 6n
+
+        classrooms.push_back(classroom); // 1n
+        push_heap(classrooms.begin(), classrooms.end(),
+                  Classroom::compareBalanced); // nlogn
     }
-
-    // Calcula o número total de horas por sala e imprime as tarefas alocadas
     std::vector<int> classroomHours;
-    for (int i = 0; i < size; i++) {
-        int idx = (front + i) % max_classrooms;
-        classroomHours.push_back(classrooms[idx].used);
-
-        printf("Sala %d:\n", idx + 1);
-        for (const Class &task : tasksPerClassroom[idx]) {
-            printf("  Tarefa: init = %d, end = %d\n", task.init, task.end);
-        }
+    for (Classroom &classroom : classrooms) { // 2n + 2
+        classroomHours.push_back(classroom.used); // 2n
     }
-
-    return {static_cast<size_t>(size), classroomHours}; // Conversão para evitar warnings
+    return {classrooms.size(), classroomHours}; // 1
 }
 
 
