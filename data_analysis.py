@@ -61,7 +61,7 @@ def plot_times_10000(avg_data):
     plt.savefig('tempo2500.png')
     plt.show()
 
-def plot_absolute_values(avg_data): # barras para tempo e variância
+def plot_absolute_values(avg_data): # barras para tempo e Desvio Padrão
     plt.figure(figsize=(10, 6))
     bar_width = 0.35
     x = np.arange(len(avg_data['num_classes']))
@@ -90,8 +90,8 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     # add_labels(bars4)
 
     plt.xlabel('N° de elementos')
-    plt.ylabel('Variância')
-    # plt.title('Variância: Alternativa vs. Clássica')
+    plt.ylabel('Desvio Padrão')
+    # plt.title('Desvio Padrão: Alternativa vs. Clássica')
     plt.xticks(x, avg_data['num_classes'], rotation=-90)
     plt.legend()
     plt.grid(False)
@@ -111,8 +111,8 @@ def plot_absolute_values(avg_data): # barras para tempo e variância
     # add_labels(bars4)
 
     plt.xlabel('N° de elementos')
-    plt.ylabel('Variância')
-    # plt.title('Variância: Alternativa vs. Clássica')
+    plt.ylabel('Desvio Padrão')
+    # plt.title('Desvio Padrão: Alternativa vs. Clássica')
     plt.xticks(x_filtered, filtered_data['num_classes'], rotation=-90)
     plt.legend()
     plt.grid(False)
